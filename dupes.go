@@ -12,10 +12,11 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 // bytesize are ints that represent a size as in "bytes of memory"
-type bytesize int64
+type bytesize uint64
 
 // String formats the underlying integer with suitable units
 // (KB, MB, .., PB) to keep the number itself small-ish.
@@ -28,6 +29,36 @@ func (bs bytesize) String() string {
 		unit++
 	}
 	return fmt.Sprintf("%.2f %s", value, units[unit])
+}
+
+type sweetint uint64
+
+func (si sweetint) String() string {
+	str := fmt.Sprintf("%d", si)
+	list := split(str, 3)
+	reverse(list)
+	str = strings.Join(list, ",")
+	return str
+}
+
+// split string s into chunks of n characters from the back
+func split(s string, n int) []string {
+	var list []string
+	var i int
+	for i = len(s); i >= n; i -= n {
+		list = append(list, s[i-n:i])
+	}
+	if i > 0 {
+		list = append(list, s[0:i])
+	}
+	return list
+}
+
+// reverse a slice of strings
+func reverse(list []string) {
+	for i, j := 0, len(list)-1; i < j; i, j = i+1, j-1 {
+		list[i], list[j] = list[j], list[i]
+	}
 }
 
 var paranoid = flag.Bool("p", false, "paranoid byte-by-byte comparison")
@@ -43,10 +74,10 @@ var sizes = make(map[int64]string)
 var hasher = sha256.New()
 
 // files counts the number of files examined
-var files int64
+var files sweetint
 
 // dupes counts the number of duplicate files
-var dupes int64
+var dupes sweetint
 
 // wasted counts the space (in bytes) occupied by duplicates
 var wasted bytesize
@@ -188,6 +219,6 @@ func main() {
 	}
 
 	if len(sizes) > 0 || len(hashes) > 0 {
-		fmt.Printf("%d files examined, %d duplicates found, %v wasted\n", files, dupes, wasted)
+		fmt.Printf("%v files examined, %v duplicates found, %v wasted\n", files, dupes, wasted)
 	}
 }
