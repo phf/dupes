@@ -1,7 +1,6 @@
 // dupes finds duplicate files in the given root directory
 //
-// TODO concurrent checksum/compare? multiple starting points?
-// library for other programs?
+// TODO concurrent checksum/compare? library for other programs?
 package main
 
 import (
@@ -80,8 +79,6 @@ func identical(pa, pb string) (bool, error) {
 			return false, nil
 		}
 	}
-
-	return true, nil
 }
 
 // checksum calculates a hash digest for the file with the given path
@@ -159,15 +156,22 @@ func check(path string, info os.FileInfo, err error) error {
 }
 
 func main() {
-	flag.Parse()
-	if len(flag.Args()) < 1 {
-		fmt.Println("error: need an argument")
-		os.Exit(1)
+	flag.Usage = func() {
+		var program = os.Args[0]
+		fmt.Fprintf(os.Stderr, "Usage: %s [option]... directory...\n", program)
+		flag.PrintDefaults()
 	}
 
-	filepath.Walk(flag.Arg(0), check)
+	flag.Parse()
+	if len(flag.Args()) < 1 {
+		flag.Usage()
+	}
 
-	if len(hashes) > 0 {
+	for _, root := range flag.Args() {
+		filepath.Walk(root, check)
+	}
+
+	if len(sizes) > 0 || len(hashes) > 0 {
 		fmt.Printf("%d files examined, %d duplicates found, %d bytes wasted\n", files, dupes, wasted)
 	}
 }
