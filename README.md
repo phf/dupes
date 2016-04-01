@@ -55,3 +55,10 @@ if you actually get one of those.)
 ## License
 
 The MIT License.
+
+## Random Notes
+
+- I tried different hash functions (MD5, SHA1, SHA256, SHA512) but none had
+the upper hand in terms of performance; I ended up removing the code to make
+them configurable to keep the tool simple; the default, SHA256, is probably
+overkill in terms of reliability, but what the heck; it's plenty fast.
