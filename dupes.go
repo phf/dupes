@@ -210,7 +210,7 @@ func check(path string, info os.FileInfo, err error) error {
 func main() {
 	flag.Usage = func() {
 		var program = os.Args[0]
-		fmt.Fprintf(os.Stderr, "Usage: %s [option]... directory...\n", program)
+		fmt.Fprintf(os.Stderr, "Usage: %s [option...] directory...\n", program)
 		flag.PrintDefaults()
 	}
 
