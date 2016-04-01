@@ -34,18 +34,18 @@ func (bs bytesize) String() string {
 // countin ints represent a count
 type countin uint64
 
-// String formats the underlying integer with commas used as a "thousands
-// separator" to make it easier to read.
+// String formats the underlying integer with commas as a "thousands separator"
+// to make it easier to read.
 func (ci countin) String() string {
 	str := fmt.Sprintf("%d", ci)
-	list := split(str, 3)
+	list := splitFromBack(str, 3)
 	reverse(list)
 	str = strings.Join(list, ",")
 	return str
 }
 
-// split string s into chunks of n characters from the back.
-func split(s string, n int) []string {
+// split string s into chunks of at most n characters from the back.
+func splitFromBack(s string, n int) []string {
 	var list []string
 	var i int
 	for i = len(s); i >= n; i -= n {
@@ -147,9 +147,11 @@ func checksum(path string) (string, error) {
 }
 
 // check is called for each path we walk. It only examines regular, non-empty
-// files. For each file it calculates a checksum; if it has seen the same
-// checksum before, it signals a duplicate; otherwise it remembers the
-// checksum and the path of the original file before moving on.
+// files. It first rules out duplicates by file size; for files that remain
+// it calculates a checksum; if it has seen the same checksum before, it
+// signals a duplicate; otherwise it remembers the checksum and the path of
+// the original file before moving on; in paranoid mode it follows up with a
+// byte-by-byte file comparison.
 func check(path string, info os.FileInfo, err error) error {
 	if err != nil {
 		return err
