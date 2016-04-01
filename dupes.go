@@ -14,6 +14,22 @@ import (
 	"runtime"
 )
 
+// bytesize are ints that represent a size as in "bytes of memory"
+type bytesize int64
+
+// String formats the underlying integer with suitable units
+// (KB, MB, .., PB) to keep the number itself small-ish.
+func (bs bytesize) String() string {
+	units := []string{"bytes", "KB", "MB", "GB", "TB", "PB"}
+	value := float64(bs)
+	unit := 0
+	for value > 1024.0 && unit < len(units)-1 {
+		value /= 1024.0
+		unit++
+	}
+	return fmt.Sprintf("%.2f %s", value, units[unit])
+}
+
 var paranoid = flag.Bool("p", false, "paranoid byte-by-byte comparison")
 var goroutines = flag.Int("j", runtime.NumCPU(), "number of goroutines")
 
@@ -33,7 +49,7 @@ var files int64
 var dupes int64
 
 // wasted counts the space (in bytes) occupied by duplicates
-var wasted int64
+var wasted bytesize
 
 // identical does a byte-by-byte comparison of the files with the
 // given paths
@@ -150,7 +166,7 @@ func check(path string, info os.FileInfo, err error) error {
 
 	fmt.Printf("%s\n%s\n\n", path, dupe)
 	dupes++
-	wasted += size
+	wasted += bytesize(size)
 
 	return nil
 }
@@ -172,6 +188,6 @@ func main() {
 	}
 
 	if len(sizes) > 0 || len(hashes) > 0 {
-		fmt.Printf("%d files examined, %d duplicates found, %d bytes wasted\n", files, dupes, wasted)
+		fmt.Printf("%d files examined, %d duplicates found, %v wasted\n", files, dupes, wasted)
 	}
 }
