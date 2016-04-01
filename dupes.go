@@ -15,13 +15,13 @@ import (
 	"strings"
 )
 
-// bytesize are ints that represent a size as in "bytes of memory"
+// bytesize ints represent a size as in "bytes of memory"
 type bytesize uint64
 
 // String formats the underlying integer with suitable units
-// (KB, MB, .., PB) to keep the number itself small-ish.
+// (KB, MB, .., YB) to keep the number itself small-ish.
 func (bs bytesize) String() string {
-	units := []string{"bytes", "KB", "MB", "GB", "TB", "PB"}
+	units := []string{"bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"}
 	value := float64(bs)
 	unit := 0
 	for value > 1024.0 && unit < len(units)-1 {
@@ -31,17 +31,20 @@ func (bs bytesize) String() string {
 	return fmt.Sprintf("%.2f %s", value, units[unit])
 }
 
-type sweetint uint64
+// countin ints represent a count
+type countin uint64
 
-func (si sweetint) String() string {
-	str := fmt.Sprintf("%d", si)
+// String formats the underlying integer with commas used as a "thousands
+// separator" to make it easier to read.
+func (ci countin) String() string {
+	str := fmt.Sprintf("%d", ci)
 	list := split(str, 3)
 	reverse(list)
 	str = strings.Join(list, ",")
 	return str
 }
 
-// split string s into chunks of n characters from the back
+// split string s into chunks of n characters from the back.
 func split(s string, n int) []string {
 	var list []string
 	var i int
@@ -54,7 +57,7 @@ func split(s string, n int) []string {
 	return list
 }
 
-// reverse a slice of strings
+// reverse a slice of strings.
 func reverse(list []string) {
 	for i, j := 0, len(list)-1; i < j; i, j = i+1, j-1 {
 		list[i], list[j] = list[j], list[i]
@@ -74,10 +77,10 @@ var sizes = make(map[int64]string)
 var hasher = sha256.New()
 
 // files counts the number of files examined
-var files sweetint
+var files countin
 
 // dupes counts the number of duplicate files
-var dupes sweetint
+var dupes countin
 
 // wasted counts the space (in bytes) occupied by duplicates
 var wasted bytesize
