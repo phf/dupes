@@ -45,3 +45,7 @@ $ dupes ~/Downloads/Stuff/
 ```
 
 Nothing to it.
+
+## License
+
+The MIT License.
