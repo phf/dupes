@@ -18,11 +18,12 @@ directly.
 
 It's very simple:
 
-	dupes path-to-root
+	dupes rootpath1 rootpath2 ...
 
-The command will walk the directories under `path-to-root` and examine all
+The command will walk the directories under each rootpath and examine all
 *regular* files. It'll print pairs of paths, separated by an empty line,
-for each duplicate it finds. It'll also print some statistics at the end:
+for each duplicate it finds across all roots. It'll also print statistics
+at the end:
 
 ```
 $ dupes ~/Downloads/Stuff/
@@ -43,10 +44,13 @@ $ dupes ~/Downloads/Stuff/
 
 ...
 
-2301 files examined, 87 duplicates found, 132268638 bytes wasted
+2,301 files examined, 87 duplicates found, 126.14 MB wasted
 ```
 
-Nothing to it.
+There's even a `-p` option for using "paranoid" byte-by-byte file comparisons
+instead of SHA256 digests. (As a bonus it'll warn you about any SHA256
+collisions it finds in "paranoid" mode. You should feel very lucky indeed
+if you actually get one of those.)
 
 ## License
 
