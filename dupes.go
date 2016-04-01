@@ -12,6 +12,9 @@ import (
 // hashes maps from digests to paths
 var hashes = make(map[string]string)
 
+// sizes maps from sizes to paths
+var sizes = make(map[int64]string)
+
 // hasher is used by checksum to calculate digests
 var hasher = sha256.New()
 
@@ -48,24 +51,41 @@ func check(path string, info os.FileInfo, err error) error {
 		return err
 	}
 
-	if !info.Mode().IsRegular() || info.Size() == 0 {
+	size := info.Size()
+
+	if !info.Mode().IsRegular() || size == 0 {
 		return nil
 	}
 
 	files++
 
-	sum, err := checksum(path)
+	var dupe string
+	var ok bool
+	if dupe, ok = sizes[size]; !ok {
+		sizes[size] = path
+		return nil
+	}
+
+	// backpatch new file into hashes
+	sum, err := checksum(dupe)
+	if err != nil {
+		return err
+	}
+	hashes[sum] = dupe
+
+	sum, err = checksum(path)
 	if err != nil {
 		return err
 	}
 
-	if dupe, ok := hashes[sum]; ok {
-		fmt.Printf("%s\n%s\n\n", path, dupe)
-		dupes++
-		wasted += info.Size()
-	} else {
+	if dupe, ok = hashes[sum]; !ok {
 		hashes[sum] = path
+		return nil
 	}
+
+	fmt.Printf("%s\n%s\n\n", path, dupe)
+	dupes++
+	wasted += size
 
 	return nil
 }
