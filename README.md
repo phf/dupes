@@ -1,5 +1,7 @@
 # dupes: find duplicate files
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/phf/dupes)](https://goreportcard.com/report/github.com/phf/dupes)
+
 A quick hack to find duplicate files. Since I am trying to practice Go again,
 guess what, it's written in Go. But don't get overly excited, okay?
 
