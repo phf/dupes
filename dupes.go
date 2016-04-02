@@ -34,34 +34,33 @@ func (bs bytesize) String() string {
 // countin ints represent a count
 type countin uint64
 
-// String formats the underlying integer with commas as a "thousands separator"
+// String formats the underlying integer with commas as "thousands separators"
 // to make it easier to read.
 func (ci countin) String() string {
 	str := fmt.Sprintf("%d", ci)
-	list := splitFromBack(str, 3)
-	reverse(list)
-	str = strings.Join(list, ",")
+	chunks := splitFromBack(str, 3)
+	str = strings.Join(chunks, ",")
 	return str
 }
 
 // split string s into chunks of at most n characters from the back.
 func splitFromBack(s string, n int) []string {
-	var list []string
-	var i int
-	for i = len(s); i >= n; i -= n {
-		list = append(list, s[i-n:i])
-	}
-	if i > 0 {
-		list = append(list, s[0:i])
-	}
-	return list
-}
+	var chunks []string
 
-// reverse a slice of strings.
-func reverse(list []string) {
-	for i, j := 0, len(list)-1; i < j; i, j = i+1, j-1 {
-		list[i], list[j] = list[j], list[i]
+	fullChunks := len(s) / n
+	restChunk := len(s) % n
+
+	if restChunk > 0 {
+		chunks = append(chunks, s[0:restChunk])
 	}
+
+	var i = restChunk
+	for fullChunks > 0 {
+		chunks = append(chunks, s[i:i+n])
+		i += n
+		fullChunks--
+	}
+	return chunks
 }
 
 var paranoid = flag.Bool("p", false, "paranoid byte-by-byte comparison")
