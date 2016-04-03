@@ -72,9 +72,6 @@ var hashes = make(map[string]string)
 // sizes maps from sizes to paths
 var sizes = make(map[int64]string)
 
-// hasher is used by checksum to calculate digests
-var hasher = sha256.New()
-
 // files counts the number of files examined
 var files countin
 
@@ -138,7 +135,7 @@ func checksum(path string) (string, error) {
 	}
 	defer file.Close()
 
-	hasher.Reset()
+	hasher := sha256.New()
 	io.Copy(hasher, file)
 	sum := fmt.Sprintf("%x", hasher.Sum(nil))
 
