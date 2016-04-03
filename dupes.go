@@ -87,7 +87,7 @@ var wasted bytesize
 // identical does a byte-by-byte comparison of the files with the
 // given paths
 func identical(pa, pb string) (bool, error) {
-	const bufferSize = 4096
+	bufferSize := os.Getpagesize()
 
 	a, err := os.Open(pa)
 	if err != nil {
