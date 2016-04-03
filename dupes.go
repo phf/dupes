@@ -1,6 +1,4 @@
 // dupes finds duplicate files in the given root directory
-//
-// TODO concurrent checksum/compare? library for other programs?
 package main
 
 import (
@@ -11,7 +9,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strings"
 )
 
@@ -64,7 +61,6 @@ func splitFromBack(s string, n int) []string {
 }
 
 var paranoid = flag.Bool("p", false, "paranoid byte-by-byte comparison")
-var goroutines = flag.Int("j", runtime.NumCPU(), "number of goroutines")
 
 // hashes maps from digests to paths
 var hashes = make(map[string]string)
