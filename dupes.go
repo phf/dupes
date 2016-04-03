@@ -97,7 +97,6 @@ func identical(pa, pb string) (bool, error) {
 	}
 	defer b.Close()
 
-	// TODO: move these out to avoid reallocating them? lazy make?
 	ba := make([]byte, bufferSize)
 	bb := make([]byte, bufferSize)
 

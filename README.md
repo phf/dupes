@@ -62,3 +62,6 @@ The MIT License.
 the upper hand in terms of performance; I ended up removing the code to make
 them configurable to keep the tool simple; the default, SHA256, is probably
 overkill in terms of reliability, but what the heck; it's plenty fast.
+- I have to unlearn "sequential performance instincts" like "allocate once
+globally" because they don't apply if the things you're allocating now get
+written to from multiple goroutines; see checksum() and identical().
