@@ -9,56 +9,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"strings"
 )
-
-// bytesize ints represent a size as in "bytes of memory"
-type bytesize uint64
-
-// String formats the underlying integer with suitable units
-// (KB, MB, .., YB) to keep the number itself small-ish.
-func (bs bytesize) String() string {
-	units := []string{"bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"}
-	value := float64(bs)
-	unit := 0
-	for value > 1024.0 && unit < len(units)-1 {
-		value /= 1024.0
-		unit++
-	}
-	return fmt.Sprintf("%.2f %s", value, units[unit])
-}
-
-// countin ints represent a count
-type countin uint64
-
-// String formats the underlying integer with commas as "thousands separators"
-// to make it easier to read.
-func (ci countin) String() string {
-	str := fmt.Sprintf("%d", ci)
-	chunks := splitFromBack(str, 3)
-	str = strings.Join(chunks, ",")
-	return str
-}
-
-// split string s into chunks of at most n characters from the back.
-func splitFromBack(s string, n int) []string {
-	var chunks []string
-
-	fullChunks := len(s) / n
-	restChunk := len(s) % n
-
-	if restChunk > 0 {
-		chunks = append(chunks, s[0:restChunk])
-	}
-
-	var i = restChunk
-	for fullChunks > 0 {
-		chunks = append(chunks, s[i:i+n])
-		i += n
-		fullChunks--
-	}
-	return chunks
-}
 
 var paranoid = flag.Bool("p", false, "paranoid byte-by-byte comparison")
 var minimumSize = flag.Int64("s", 1, "minimum size (in bytes) of duplicate file")
@@ -70,10 +21,10 @@ var hashes = make(map[string]string)
 var sizes = make(map[int64]string)
 
 // files counts the number of files examined
-var files countin
+var files counter
 
 // dupes counts the number of duplicate files
-var dupes countin
+var dupes counter
 
 // wasted counts the space (in bytes) occupied by duplicates
 var wasted bytesize
