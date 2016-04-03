@@ -56,6 +56,12 @@ if you actually get one of those.)
 
 The MIT License.
 
+## TODO
+
+- make the darn thing concurrent so we can hide latencies and take advantage
+of multiple cores
+- wrap it up as a library or service for other Go programs?
+
 ## Random Notes
 
 - I tried different hash functions (MD5, SHA1, SHA256, SHA512) but none had
@@ -64,4 +70,11 @@ them configurable to keep the tool simple; the default, SHA256, is probably
 overkill in terms of reliability, but what the heck; it's plenty fast.
 - I have to unlearn "sequential performance instincts" like "allocate once
 globally" because they don't apply if the things you're allocating now get
-written to from multiple goroutines; see checksum() and identical().
+written to from multiple goroutines; see `hasher` in `checksum` and the two
+buffers in `identical` for instance.
+- There are many ways to make `dupes` more concurrent. The obvious one is to
+start a goroutine for each root directory. Curiously there's not much of a
+speedup if we only pass two or three roots; once we pass twenty or so,
+however, things start to heat up.
+- I'll have to write a number of competing concurrent variants to see what's
+best. So I'll leave `dupes.go` as a non-concurrent reference version for now.
