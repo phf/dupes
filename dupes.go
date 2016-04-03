@@ -61,6 +61,7 @@ func splitFromBack(s string, n int) []string {
 }
 
 var paranoid = flag.Bool("p", false, "paranoid byte-by-byte comparison")
+var minimumSize = flag.Int64("s", 1, "minimum size (in bytes) of duplicate file")
 
 // hashes maps from digests to paths
 var hashes = make(map[string]string)
@@ -150,7 +151,7 @@ func check(path string, info os.FileInfo, err error) error {
 
 	size := info.Size()
 
-	if !info.Mode().IsRegular() || size == 0 {
+	if !info.Mode().IsRegular() || size < *minimumSize {
 		return nil
 	}
 
