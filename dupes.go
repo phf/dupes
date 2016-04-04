@@ -16,9 +16,9 @@ const (
 )
 
 var (
-	paranoid = flag.Bool("p", false, "paranoid byte-by-byte comparison")
+	paranoid    = flag.Bool("p", false, "paranoid byte-by-byte comparison")
 	minimumSize = flag.Int64("s", 1, "minimum size (in bytes) of duplicate file")
-	glob = flag.String("g", globDefault, "glob expression for file names")
+	glob        = flag.String("g", globDefault, "glob expression for file names")
 )
 
 // hashes maps from digests to paths
