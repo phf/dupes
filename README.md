@@ -89,6 +89,11 @@ buffers in `identical` for instance.
 start a goroutine for each root directory. Curiously there's not much of a
 speedup if we only pass two or three roots; once we pass twenty or so,
 however, things start to heat up.
+- Another approach splits `check` into a pipeline of goroutines connected
+with channels. Each goroutine "filters out" things that cannot possibly
+be duplicates and passes the rest further down to more thorough filters.
+(This can be combined with one goroutine for each root directory.
+And we can have pools of workers to do long file operations concurrently.)
 - I'll have to write a number of competing concurrent variants to see what's
 best. So I'll leave `dupes.go` as a non-concurrent reference version for now.
 
