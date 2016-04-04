@@ -11,8 +11,15 @@ import (
 	"path/filepath"
 )
 
-var paranoid = flag.Bool("p", false, "paranoid byte-by-byte comparison")
-var minimumSize = flag.Int64("s", 1, "minimum size (in bytes) of duplicate file")
+const (
+	globDefault = "*"
+)
+
+var (
+	paranoid = flag.Bool("p", false, "paranoid byte-by-byte comparison")
+	minimumSize = flag.Int64("s", 1, "minimum size (in bytes) of duplicate file")
+	glob = flag.String("g", globDefault, "glob expression for file names")
+)
 
 // hashes maps from digests to paths
 var hashes = make(map[string]string)
@@ -106,6 +113,16 @@ func check(path string, info os.FileInfo, err error) error {
 		return nil
 	}
 
+	if *glob != globDefault {
+		matched, err := filepath.Match(*glob, info.Name())
+		if err != nil {
+			return err
+		}
+		if !matched {
+			return nil
+		}
+	}
+
 	files++
 
 	var dupe string
@@ -160,6 +177,12 @@ func main() {
 	flag.Parse()
 	if len(flag.Args()) < 1 {
 		flag.Usage()
+	}
+
+	_, err := filepath.Match(*glob, "checking pattern syntax")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: invalid pattern for -g (%v)\n", err)
+		os.Exit(1)
 	}
 
 	for _, root := range flag.Args() {
