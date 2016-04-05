@@ -174,7 +174,7 @@ func check(path string, info os.FileInfo, err error) error {
 
 func sortedDupes() []string {
 	var sk []string
-	for k, _ := range final {
+	for k := range final {
 		sk = append(sk, k)
 	}
 	sort.Strings(sk)
