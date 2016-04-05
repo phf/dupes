@@ -21,26 +21,24 @@ It's very simple:
 	dupes rootpath1 rootpath2 ...
 
 The command will walk the directories under each rootpath and examine all
-*regular* files. It'll print pairs of paths, separated by an empty line,
+*regular* files. It'll print clusters of paths, separated by an empty line,
 for each duplicate it finds across all roots. It'll also print statistics
 at the end:
 
 ```
-$ dupes ~/Downloads/Stuff/
+$ dupes ~/Downloads/
 
 ...
 
-/home/phf/Downloads/Stuff/Maps/107031a.jpg
-/home/phf/Downloads/Stuff/107031.jpg
+/home/phf/Downloads/BPT.pdf
+/home/phf/Downloads/MATH_BOOKS/Basic_Probability_Theory_Robert_Ash.pdf
 
-/home/phf/Downloads/Stuff/Maps/bwpoliticalmap2.gif
-/home/phf/Downloads/Stuff/Maps/bwpoliticalmap.gif
+/home/phf/Downloads/CharSheets-G(1).pdf
+/home/phf/Downloads/CharSheets-G.pdf
+/home/phf/Downloads/Stuff/dan/CharSheets-G.pdf
 
-/home/phf/Downloads/Stuff/Maps/calendar_awesome.jpg
-/home/phf/Downloads/Stuff/Maps/393031_3485829032040_1460844946_3050753_389238284_n.jpg
-
-/home/phf/Downloads/Stuff/Maps/cogh-undercity.gif
-/home/phf/Downloads/Stuff/Denis/cogh-undercity.gif
+/home/phf/Downloads/fish-0003/README.dist
+/home/phf/Downloads/fish-0014/README.dist
 
 ...
 
@@ -72,8 +70,7 @@ The MIT License.
 of multiple cores
 - wrap it up as a library or service for other Go programs?
 - add hard linking or deleting? probably not
-- showing all duplicates together would be more useful, but I'll need
-to keep more state around
+- display size of dupes? sort output by size?
 
 ## Random Notes
 
