@@ -9,6 +9,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"sort"
 )
 
 const (
@@ -26,6 +27,9 @@ var hashes = make(map[string]string)
 
 // sizes maps from sizes to paths
 var sizes = make(map[int64]string)
+
+// final maps from paths to duplicate paths (collates all dupes)
+var final = make(map[string][]string)
 
 // files counts the number of files examined
 var files counter
@@ -160,11 +164,21 @@ func check(path string, info os.FileInfo, err error) error {
 		}
 	}
 
-	fmt.Printf("%s\n%s\n\n", path, dupe)
 	dupes++
 	wasted += bytesize(size)
 
+	final[dupe] = append(final[dupe], path)
+
 	return nil
+}
+
+func sortedDupes() []string {
+	var sk []string
+	for k, _ := range final {
+		sk = append(sk, k)
+	}
+	sort.Strings(sk)
+	return sk
 }
 
 func main() {
@@ -187,6 +201,16 @@ func main() {
 
 	for _, root := range flag.Args() {
 		filepath.Walk(root, check)
+	}
+
+	sk := sortedDupes()
+	for _, k := range sk {
+		vs := final[k]
+		fmt.Println(k)
+		for _, v := range vs {
+			fmt.Println(v)
+		}
+		fmt.Println()
 	}
 
 	if len(sizes) > 0 || len(hashes) > 0 {
