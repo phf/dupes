@@ -17,9 +17,9 @@ const (
 )
 
 var (
-	paranoid    = flag.Bool("p", false, "paranoid byte-by-byte comparison")
-	minimumSize = flag.Int64("s", 1, "minimum size (in bytes) of duplicate file")
-	glob        = flag.String("g", globDefault, "glob expression for file names")
+	paranoid    = flag.Bool("p", false, "paranoid byte-by-byte file comparison")
+	minimumSize = flag.Int64("s", 1, "minimum size (in bytes) of files to consider")
+	globbing    = flag.String("g", globDefault, "glob expression for files to consider")
 )
 
 // hashes maps from digests to paths
@@ -40,11 +40,9 @@ var dupes counter
 // wasted counts the space (in bytes) occupied by duplicates
 var wasted bytesize
 
-// identical does a byte-by-byte comparison of the files with the
+// fileContentsMatch does a byte-by-byte comparison of the files with the
 // given paths
-func identical(pa, pb string) (bool, error) {
-	bufferSize := os.Getpagesize()
-
+func fileContentsMatch(pa, pb string) (bool, error) {
 	a, err := os.Open(pa)
 	if err != nil {
 		return false, err
@@ -56,6 +54,12 @@ func identical(pa, pb string) (bool, error) {
 	}
 	defer b.Close()
 
+	return fileContentsHelper(a, b)
+}
+
+func fileContentsHelper(a, b io.Reader) (bool, error) {
+	bufferSize := os.Getpagesize()
+
 	ba := make([]byte, bufferSize)
 	bb := make([]byte, bufferSize)
 
@@ -63,24 +67,30 @@ func identical(pa, pb string) (bool, error) {
 		la, erra := a.Read(ba)
 		lb, errb := b.Read(bb)
 
-		if erra != nil || errb != nil {
-			if erra == io.EOF && errb == io.EOF {
-				return true, nil
-			}
-			if erra != nil {
-				return false, erra
-			}
-			if errb != nil {
-				return false, errb
+		// specification of Read() says to check returned size
+		// before considering errors; who are we to disagree?
+		if la > 0 || lb > 0 {
+			// it's okay to use Equal here because whatever may
+			// be left behind in the buffers after a short read
+			// had to be Equal in the prior iteration; note that
+			// we don't have to check la == lb either because if
+			// they were not, Equal should fail
+			if !bytes.Equal(ba, bb) {
+				return false, nil
 			}
 		}
 
-		if la != lb { // TODO: short read always at end of file?
-			return false, nil
-		}
-
-		if !bytes.Equal(ba, bb) {
-			return false, nil
+		// specification of Read() says that sooner or later we'll
+		// see io.EOF regardless of returned size; only if both
+		// files end in the same iteration (and made it past Equal
+		// above) do we have a duplicate
+		switch {
+		case erra == io.EOF && errb == io.EOF:
+			return true, nil
+		case erra != nil:
+			return false, erra
+		case errb != nil:
+			return false, errb
 		}
 	}
 }
@@ -117,8 +127,8 @@ func check(path string, info os.FileInfo, err error) error {
 		return nil
 	}
 
-	if *glob != globDefault {
-		matched, err := filepath.Match(*glob, info.Name())
+	if *globbing != globDefault {
+		matched, err := filepath.Match(*globbing, info.Name())
 		if err != nil {
 			return err
 		}
@@ -154,7 +164,7 @@ func check(path string, info os.FileInfo, err error) error {
 	}
 
 	if *paranoid {
-		same, err := identical(path, dupe)
+		same, err := fileContentsMatch(path, dupe)
 		if err != nil {
 			return err
 		}
@@ -193,7 +203,7 @@ func main() {
 		flag.Usage()
 	}
 
-	_, err := filepath.Match(*glob, "checking pattern syntax")
+	_, err := filepath.Match(*globbing, "checking pattern syntax")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: invalid pattern for -g (%v)\n", err)
 		os.Exit(1)
