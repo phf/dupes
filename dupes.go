@@ -1,4 +1,4 @@
-// dupes finds duplicate files in the given root directory
+// Command dupes finds duplicate files in the given root directory
 package main
 
 import (
@@ -22,23 +22,15 @@ var (
 	globbing    = flag.String("g", globDefault, "glob expression for files to consider")
 )
 
-// hashes maps from digests to paths
-var hashes = make(map[string]string)
+var (
+	hashes = make(map[string]string)   // maps from digests to paths
+	sizes  = make(map[int64]string)    // maps from sizes to paths
+	final  = make(map[string][]string) // maps from paths to duplicate paths (collates all dupes)
 
-// sizes maps from sizes to paths
-var sizes = make(map[int64]string)
-
-// final maps from paths to duplicate paths (collates all dupes)
-var final = make(map[string][]string)
-
-// files counts the number of files examined
-var files counter
-
-// dupes counts the number of duplicate files
-var dupes counter
-
-// wasted counts the space (in bytes) occupied by duplicates
-var wasted bytesize
+	files  counter  // number of files examined
+	dupes  counter  // number of duplicate files
+	wasted bytesize // space (in bytes) occupied by duplicates
+)
 
 // fileContentsMatch does a byte-by-byte comparison of the files with the
 // given paths
