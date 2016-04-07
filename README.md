@@ -46,7 +46,7 @@ $ dupes ~/Downloads/
 ```
 
 There's a `-p` option for using "paranoid" byte-by-byte file comparisons
-instead of SHA256 digests. (As a bonus it'll warn you about any SHA256
+instead of SHA1 digests. (As a bonus it'll warn you about any SHA1
 collisions it finds in "paranoid" mode. You should feel very lucky indeed
 if you actually get one of those.)
 
@@ -59,6 +59,30 @@ file names you care about; it defaults to `*` which matches all file names;
 note that you may have to escape the pattern as in `-g '*.pdf'` if the
 current directory contains files that would match (which would cause your
 shell to do the expansion instead).
+
+## Why SHA1?
+
+When I first hacked `dupes`, I ran a *bad* benchmark that made it look like
+there's little performance difference between the various hash functions. I
+guess I chalked that up to the library implementation, but I really should
+have known better. Here's why I couldn't stick with SHA256:
+
+```
+13,740 files examined, 728 duplicates found, 1.00 GB wasted
+
+sha256: 16.54u 1.80s 18.42r 36352kB
+sha1:    6.33u 1.93s  8.42r 37152kB
+md5:     4.67u 1.87s  6.63r 35840kB
+adler32: 3.10u 1.82s  5.06r 37824kB
+```
+
+I don't know about you, but I am not willing to pay *that* much for really,
+*really*, **really** low chances of collisions. However, I cannot just go
+by performance alone: Most users will skip `-p` and rely on the checksum
+to decide what they can delete. Using something as short as Adler-32 just
+doesn't inspire much confidence in that regard. So it came down to choosing
+between SHA1 and MD5 (I want to stay with widely-used algorithms) and since
+SHA1 works for `git` I went that way.
 
 ## License
 
@@ -74,10 +98,6 @@ of multiple cores
 
 ## Random Notes
 
-- I tried different hash functions (MD5, SHA1, SHA256, SHA512) but none had
-the upper hand in terms of performance; I ended up removing the code to make
-them configurable to keep the tool simple; the default, SHA256, is probably
-overkill in terms of reliability, but what the heck; it's plenty fast.
 - I have to unlearn "sequential performance instincts" like "allocate once
 globally" because they don't apply if the things you're allocating now get
 written to from multiple goroutines; see `hasher` in `checksum` and the two

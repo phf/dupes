@@ -3,7 +3,7 @@ package main
 
 import (
 	"bytes"
-	"crypto/sha256"
+	"crypto/sha1"
 	"flag"
 	"fmt"
 	"io"
@@ -97,7 +97,7 @@ func checksum(path string) (string, error) {
 	}
 	defer file.Close()
 
-	hasher := sha256.New()
+	hasher := sha1.New()
 	_, err = io.Copy(hasher, file)
 	sum := fmt.Sprintf("%x", hasher.Sum(nil))
 
@@ -163,7 +163,7 @@ func check(path string, info os.FileInfo, err error) error {
 			return err
 		}
 		if !same {
-			fmt.Printf("cool: %s sha256-collides with %s!\n", path, dupe)
+			fmt.Printf("cool: %s sha1-collides with %s!\n", path, dupe)
 			return nil
 		}
 	}
