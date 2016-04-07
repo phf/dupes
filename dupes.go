@@ -9,6 +9,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"runtime/pprof"
 	"sort"
 )
 
@@ -20,6 +21,7 @@ var (
 	paranoid    = flag.Bool("p", false, "paranoid byte-by-byte file comparison")
 	minimumSize = flag.Int64("s", 1, "minimum size (in bytes) of files to consider")
 	globbing    = flag.String("g", globDefault, "glob expression for files to consider")
+	cpuprofile  = flag.String("cpuprofile", "", "write cpu profile to file (development only)")
 )
 
 var (
@@ -199,6 +201,16 @@ func main() {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: invalid pattern for -g (%v)\n", err)
 		os.Exit(1)
+	}
+
+	if *cpuprofile != "" {
+		f, err := os.Create(*cpuprofile)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error: can't create profile (%v)\n", err)
+			os.Exit(1)
+		}
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
 	}
 
 	for _, root := range flag.Args() {
