@@ -1,4 +1,4 @@
-// Command dupes finds duplicate files in the given root directory
+// Command dupes finds duplicate files in the given root directories.
 package main
 
 import (
@@ -96,10 +96,10 @@ func checksum(path string) (string, error) {
 	defer file.Close()
 
 	hasher := sha256.New()
-	io.Copy(hasher, file)
+	_, err = io.Copy(hasher, file)
 	sum := fmt.Sprintf("%x", hasher.Sum(nil))
 
-	return sum, nil
+	return sum, err
 }
 
 // check is called for each path we walk. It only examines regular, non-empty
@@ -202,7 +202,10 @@ func main() {
 	}
 
 	for _, root := range flag.Args() {
-		filepath.Walk(root, check)
+		err = filepath.Walk(root, check)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "warning: issue while walking %s (%v)\n", root, err)
+		}
 	}
 
 	sk := sortedDupes()
