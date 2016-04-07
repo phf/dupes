@@ -101,7 +101,7 @@ of multiple cores
 - I have to unlearn "sequential performance instincts" like "allocate once
 globally" because they don't apply if the things you're allocating now get
 written to from multiple goroutines; see `hasher` in `checksum` and the two
-buffers in `identical` for instance.
+buffers in `fileContentsHelper` for instance.
 - There are many ways to make `dupes` more concurrent. The obvious one is to
 start a goroutine for each root directory. Curiously there's not much of a
 speedup if we only pass two or three roots; once we pass twenty or so,
