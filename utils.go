@@ -1,3 +1,7 @@
+// Copyright 2016 Peter H. Froehlich. All rights reserved.
+// Use of this source code is governed by the MIT license,
+// see the LICENSE.md file.
+
 package main
 
 import (
