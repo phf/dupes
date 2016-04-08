@@ -113,6 +113,13 @@ be duplicates and passes the rest further down to more thorough filters.
 And we can have pools of workers to do long file operations concurrently.)
 - I'll have to write a number of competing concurrent variants to see what's
 best. So I'll leave `dupes.go` as a non-concurrent reference version for now.
+- Profiling `dupes` you'll notice that computing hashes takes the most time.
+On a whim, I tried computing *two* checksums: one for just the first few
+thousand bytes, another for the whole file. Alas that doesn't help much.
+We already filter by file size, remember? For large files, matching size
+starts being a pretty good indicator of duplicates---unless you're dealing
+with lots of disk images maybe. And for small file there's already not much
+to do for the checksum. So no dice.
 
 ## Kudos
 
