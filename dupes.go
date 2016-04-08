@@ -1,4 +1,28 @@
-// Command dupes finds duplicate files in the given root directories.
+// Copyright 2016 Peter H. Froehlich. All rights reserved.
+// Use of this source code is governed by the MIT license,
+// see the LICENSE.md file.
+
+// Dupes finds duplicate files in the given paths.
+//
+// Run dupes as follows:
+//
+//	dupes path1 path2 ...
+//
+// Dupes will process each path. Directories will be walked
+// recursively, regular files will be checked against all
+// others. Dupes will print clusters of paths, separated
+// by an empty line, for each duplicate it finds. Dupes will
+// also print statistics about duplicates at the end.
+//
+// The -p option uses a "paranoid" byte-by-byte file comparison
+// instead of SHA1 digests to identify duplicates.
+//
+// The -s option sets the minimum file size you care about;
+// if defaults to 1 so empty files are ignored.
+//
+// The -g option sets a globbing pattern for the file names
+// you care about; it defaults to * which matches all file
+// names.
 package main
 
 import (

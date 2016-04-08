@@ -1,5 +1,6 @@
 # dupes: find duplicate files
 
+[![GoDoc](https://godoc.org/github.com/phf/dupes?status.svg)](https://godoc.org/github.com/phf/dupes)
 [![Go Report Card](https://goreportcard.com/badge/github.com/phf/dupes)](https://goreportcard.com/report/github.com/phf/dupes)
 
 A quick hack to find duplicate files. Since I am trying to practice Go again,
@@ -18,12 +19,12 @@ directly.
 
 It's very simple:
 
-	dupes rootpath1 rootpath2 ...
+	dupes path1 path2 ...
 
-The command will walk the directories under each rootpath and examine all
-*regular* files. It'll print clusters of paths, separated by an empty line,
-for each duplicate it finds across all roots. It'll also print statistics
-at the end:
+Dupes will process each path. Directories will be walked recursively,
+regular files will be checked against all others. Dupes will print
+clusters of paths, separated by an empty line, for each duplicate it
+finds. Dupes will also print statistics about duplicates at the end:
 
 ```
 $ dupes ~/Downloads/
@@ -45,20 +46,23 @@ $ dupes ~/Downloads/
 2,301 files examined, 87 duplicates found, 126.14 MB wasted
 ```
 
-There's a `-p` option for using "paranoid" byte-by-byte file comparisons
-instead of SHA1 digests. (As a bonus it'll warn you about any SHA1
-collisions it finds in "paranoid" mode. You should feel very lucky indeed
-if you actually get one of those.)
+The `-p` option uses a "paranoid" byte-by-byte file comparison instead
+of SHA1 digests to identify duplicates. (As a bonus it'll warn you about
+any SHA1 collisions it finds in "paranoid" mode. You should feel very
+lucky indeed if you actually get one of those.)
 
-The `-s` option can be used to set a minimum file size you care about; it
-defaults to `1` so empty files are ignored.
+The `-s` option sets the minimum file size you care about; if defaults
+to 1 so empty files are ignored.
 
-The `-g` option allows you to specify a
-[globbing](https://golang.org/pkg/path/filepath/#Match) pattern for the
-file names you care about; it defaults to `*` which matches all file names;
-note that you may have to escape the pattern as in `-g '*.pdf'` if the
-current directory contains files that would match (which would cause your
-shell to do the expansion instead).
+The `-g` option sets a [globbing](https://golang.org/pkg/path/filepath/#Match)
+pattern for the file names you care about; it defaults to `*` which matches
+all file names. Note that you may have to escape the pattern as in
+`-g '*.pdf'` if the current directory contains files that would match (which
+would cause your shell to do the expansion instead).
+
+## License
+
+The MIT License.
 
 ## Why SHA1?
 
@@ -83,10 +87,6 @@ to decide what they can delete. Using something as short as Adler-32 just
 doesn't inspire much confidence in that regard. So it came down to choosing
 between SHA1 and MD5 (I want to stay with widely-used algorithms) and since
 SHA1 works for `git` I went that way.
-
-## License
-
-The MIT License.
 
 ## TODO
 
