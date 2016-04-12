@@ -254,7 +254,5 @@ func main() {
 		fmt.Println()
 	}
 
-	if len(sizes) > 0 || len(hashes) > 0 {
-		fmt.Printf("%v files examined, %v duplicates found, %v wasted\n", files, dupes, wasted)
-	}
+	fmt.Printf("%v files examined, %v duplicates found, %v wasted\n", files, dupes, wasted)
 }
